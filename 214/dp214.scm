@@ -38,34 +38,56 @@
           (x2 (car pt2)) (y2 (cdr pt2)))
       (sqrt (+ (square (- x1 x2)) (square (- y1 y2)))))))
 
+;(define split-at
+;  (lambda (to-split i)
+;    (if (null? to-split)
+;      '()
+;        (if
+;          (= i 0) (split-at (cdr to-split) (- i 1))
+;          (cons (car to-split) (split-at (cdr to-split) (- i 1)))))))
+
 (define split-at
   (lambda (to-split i)
-    (if (null? to-split)
-      '()
-        (if
-          (= i 0) (split-at (cdr to-split) (- i 1))
-          (cons (car to-split) (split-at (cdr to-split) (- i 1)))))))
+    (define inner-split
+      (lambda (to-split i so-far)
+        (if (null? to-split)
+          so-far
+          (if
+            (= i 0) (inner-split (cdr to-split) (- i 1) so-far)
+            (let ((next-list (if
+                               (null? so-far)
+                               (list (car to-split))
+                               (cons (car to-split) so-far))))
+              (inner-split (cdr to-split) (- i 1) next-list))))))
+    (inner-split to-split i '())))
+
+(define closest-and-index
+  (lambda (data)
+    ; data is a list of (distance, point) pairs
+    (define inner
+      (lambda (inner-data i best)
+        (let* ((cur (car inner-data))
+               (rest (cdr inner-data))
+               (point (cadr cur))
+               (dist (car cur))
+               (best-dist (cadr best))
+               (new-best
+                 (if (< dist best-dist)
+                   (list point dist i)
+                   best)))
+          (if (null? rest)
+            new-best
+            (inner rest (+ i 1) new-best)))))
+    (inner data 0 (list 'garbage 9999 'garbage))))
 
 (define distance-nearest-and-pop
   (lambda (start-pos treats)
-    (define closest-and-index
-      (lambda (data i)
-        (let* ((cur (car data))
-               (rest (cdr data))
-               (point (cadr cur))
-               (dist (car cur)))
-          (if (null? rest)
-            (list point dist i)
-            (let* ((next-call (closest-and-index rest (+ i 1)))
-                   (next-dist (cadr next-call)))
-              (cond ((< dist next-dist) (list point dist i))
-                    (else next-call)))
-            ))))
     (let* ((with-distance (map (lambda (t) (list (distance start-pos t) t)) treats))
-           (closest (closest-and-index with-distance 0))
+           (closest (closest-and-index with-distance))
            (best-point (car closest))
            (best-dist (cadr closest))
            (split-idx (caddr closest)))
+      ;(display "is it split-at's fault?")
       (list best-dist best-point (split-at treats split-idx)))))
 
 (define get-total-distance
