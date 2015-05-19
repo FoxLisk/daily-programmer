@@ -12,10 +12,6 @@
 (define parse-line
   (lambda (line)
     (let ((space-index (string-find-next-char line #\ )))
-      ;(write-line
-      ;  (string-append
-      ;    "parsing " line " split at " (number->string space-index)
-      ;    " into " (string-head line space-index) " and " (string-tail line space-index)))
         (cons
           (string->number (string-head line space-index))
           (string->number (string-tail line (+ 1 space-index)))))))
