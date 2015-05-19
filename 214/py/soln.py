@@ -35,7 +35,7 @@ class Boundary(object):
     x, y = point
     return (
         (self.x <= x < self.x + self.width)
-        and 
+        and
         (self.y <= y < self.y + self.width))
 
   def intersects(self, other):
@@ -58,7 +58,7 @@ class Boundary(object):
     nw = Boundary((x, y+hh), hw, hh)
     ne = Boundary((x+hw, y+hh), hw, hh)
     return nw, ne, se, sw
-    
+
 
 class QuadTree(object):
   def __init__(self, boundary, capacity):
@@ -70,6 +70,9 @@ class QuadTree(object):
 
   def __len__(self):
     return self.size
+
+  def __repr__(self):
+      return '<QuadTree(%r, %d)>' % (self.boundary, self.capacity)
 
   def add(self, pt):
     if not self.boundary.contains(pt):
@@ -99,7 +102,7 @@ class QuadTree(object):
     matching = []
     if not self.boundary.intersects(boundary):
       return matching
-    
+
     for p in self.pts:
       if boundary.contains(p):
         matching.append(p)
@@ -108,23 +111,21 @@ class QuadTree(object):
       for sub in (self.nw, self.ne, self.se, self.sw):
         matching.extend(sub.query(boundary))
     return matching
- 
+
 
   def subdivide(self):
     self.nw, self.ne, self.se, self.sw = [QuadTree(b, self.capacity) for b in self.boundary.make_children()]
 
   def remove(self, point):
     if not self.boundary.contains(point):
-      print 'doesnt contain'
+      #print '%r doesnt contain %r' % (self, point)
       return False
 
     if point in self.pts:
-      print 'removing point'
       del self.pts[self.pts.index(point)]
       return True
 
     if self.nw is None:
-      print 'not found'
       return True # it's okay if we can't remove it; just means it wasn't there
 
     if self.nw.remove(point):
@@ -136,9 +137,7 @@ class QuadTree(object):
     if self.se.remove(point):
       return True
 
-    print 'not found'
     return True # it's okay if we can't remove it; just means it wasn't there
-
 
 
 def dist_with_pop(start, pts):
@@ -171,16 +170,13 @@ def process(points, start):
       if dist < best_dist:
         best_pt, best_dist = match, dist
 
-    print 'best: %s, %s' % (best_pt, best_dist)
-      
-    print points
-    if start != (.5, .5):
-      del points[points.index(start)]
-      qt.remove(start)
+
+    del points[points.index(best_pt)]
+    qt.remove(best_pt)
 
     travel_dist += best_dist
     start = best_pt
-  return dist
+  return travel_dist
 
 
 def main(fn):
@@ -192,7 +188,7 @@ def main(fn):
       pts.append((float(x), float(y)))
 
   print process(pts, (.5, .5))
-    
+
 if __name__ == '__main__':
   args = sys.argv[1:]
   if '--prof' in args:
@@ -203,4 +199,4 @@ if __name__ == '__main__':
   else:
     e = main('input.dat')
   sys.exit(e)
-  
+

@@ -38,14 +38,6 @@
           (x2 (car pt2)) (y2 (cdr pt2)))
       (sqrt (+ (square (- x1 x2)) (square (- y1 y2)))))))
 
-;(define split-at
-;  (lambda (to-split i)
-;    (if (null? to-split)
-;      '()
-;        (if
-;          (= i 0) (split-at (cdr to-split) (- i 1))
-;          (cons (car to-split) (split-at (cdr to-split) (- i 1)))))))
-
 (define split-at
   (lambda (to-split i)
     (define inner-split
