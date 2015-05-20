@@ -51,32 +51,26 @@
   (defn build-lists (build-len)
       (if (zero? build-len)
         '(())
-        (append (map (lambda (l) (cons 0 l)) (build-lists (- build-len 1)))
-                (map (lambda (l) (cons 1 l)) (build-lists (- build-len 1))))))
+        (let ((lists (build-lists (- build-len 1))))
+            (append (map (lambda (l) (cons 0 l)) lists)
+                    (map (lambda (l) (cons 1 l)) lists)))))
   (map list->vector (build-lists len)))
-
-(defn network-sorts-input (network nums)
-   (is-sorted (run-network network nums)))
 
 (defn network-sorts-inputs (network inputs)
   (defn sort-tail (inner-inputs)
     (if (null? inner-inputs)
       #t
       (if
-        (not (network-sorts-input network (car inner-inputs)))
+        (not (is-sorted (run-network network (car inner-inputs))))
         #f
         (sort-tail (cdr inner-inputs)))))
   (sort-tail inputs))
 
 (defn test-network (network)
   (let ((size (network-num-wires network)))
-    (network-sorts-inputs network (all-binary-seqs size))))
-
-(define network (get-input "input.dat"))
-(begin
-  (newline)
     (if
-      (test-network network)
-      (write-string "Valid network\n")
-      (write-string "Invalid network\n"))
-    (newline))
+      (network-sorts-inputs network (all-binary-seqs size))
+      "Valid network"
+      "Invalid network")))
+
+(test-network (get-input "input.dat"))
