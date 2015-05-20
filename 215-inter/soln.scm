@@ -13,7 +13,7 @@
   (let ((lines (read-lines filename)))
     (parse-input
       (map-each string->number
-        (map (lambda (line) (split-line line #\ )) lines)))))
+        (split-lines lines #\ )))))
 
 (defn swap (vec i j)
   (let ((i-val (vector-ref vec i)) (j-val (vector-ref vec j)))

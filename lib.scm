@@ -22,6 +22,9 @@
         (cons head (split-line tail char)))
       (list line))))
 
+(defn split-lines (lines char)
+  (map (lambda (line) (split-line line char)) lines))
+
 ; map `fn` a->b to `iter` [[a]]
 ; :: a->b [[a]] -> [[b]]
 (defn map-each (fn iter)
