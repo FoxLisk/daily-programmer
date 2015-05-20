@@ -24,7 +24,7 @@
 
 ; map `fn` a->b to `iter` [[a]]
 ; :: a->b [[a]] -> [[b]]
-(defn deep-map (fn iter)
+(defn map-each (fn iter)
   (map (lambda (child) (map fn child)) iter))
 
 ; takes a list of parameter lists, and applies `fn` to each
